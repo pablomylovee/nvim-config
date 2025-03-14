@@ -28,7 +28,7 @@ vim.opt.wrap = false
 vim.opt.showmode = false
 
 -- Hotkeys
-vim.keymap.set("n", "t", ":Telescope find_files<CR>")
+vim.keymap.set("n", "t", ":lua Snacks.picker.files()<CR>", {silent = true})
 
 -- Setup lazy.nvim
 require("lazy").setup({
@@ -40,3 +40,4 @@ require("lazy").setup({
   install = { colorscheme = { "habamax" } },
   checker = { enabled = true },
 })
+

@@ -4,6 +4,7 @@ math.randomseed(os.time())
 
 return {
   "folke/snacks.nvim",
+  priority = 1000,
   opts = {
     dashboard = {
 	  sections = {
@@ -26,7 +27,16 @@ return {
 	]], quotes_and_shii[math.random(1, #quotes_and_shii)]),
 		}
 },
-}
-	
+
+	quickfile = {enabled = true},
+	explorer = {enabled = true},
+	terminal = {enabled = false},
+	indent = {enabled = true},
+	picker = {
+		enabled = true,
+		prompt = ">>> ",
+	},
+},
+
 }
 
