@@ -19,9 +19,10 @@ vim.opt.mouse = ""
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.wo.wrap = false
-vim.g.python3_host_prog = "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3"
+vim.g.python3_host_prog = "/usr/bin/python3"
 vim.env.PATH = vim.env.PATH .. ':/usr/local/bin'
-
+vim.opt.showmode = false
+vim.opt.ignorecase = true
 -- misc shortcuts
 vim.keymap.set("n", "<leader>x", ":bd<CR>", {noremap = true, silent = true, desc = "Close buffer"})
 vim.keymap.set("n", "<leader>t", ":bot terminal<CR>i", {noremap = true, silent = true, desc = "Use terminal"})
@@ -31,6 +32,8 @@ vim.keymap.set("n", "q", ":quit<CR>", {noremap = true, silent = true, desc = "Qu
 vim.keymap.set("n", "Q", ":quitall!<CR>", {noremap = true, silent = true, desc = "Force quit"})
 vim.keymap.set({ "n", "v" }, "x", '"_x', { noremap = true, silent = true })
 vim.keymap.set("n", "X", '"_X', { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>vs", function() require("vite").start() end, {noremap = true, silent = true, desc = "Start Vite in working directory"})
+vim.keymap.set("n", "<leader>vx", function() require("vite").stop() end, {noremap = true, silent = true, desc = "Start Vite in working directory"})
 -- switching windows
 vim.keymap.set("n", "<C-j>", ":wincmd j<CR>", {noremap = true, silent = true})
 vim.keymap.set("n", "<C-k>", ":wincmd k<CR>", {noremap = true, silent = true})
@@ -49,51 +52,85 @@ vim.keymap.set("n", "<leader>wv=", ":vertical resize +2<CR>", { silent = true })
 
 -- Plugin setup
 require("lazy").setup({
-  {
-    "folke/snacks.nvim",
-    priority = 1000,
-    lazy = false,
-    opts = {
-      bigfile = { enabled = true },
-      quickfile = { enabled = true },
-      statuscolumn = { enabled = true },
-      picker = { enabled = true },
-      dashboard = { enabled = true},
-      image = { enabled = true},
-      indent = { enabled = true},
+    {
+        "folke/snacks.nvim",
+        priority = 1000,
+        lazy = false,
+        opts = {
+          bigfile = { enabled = true },
+          quickfile = { enabled = true },
+          statuscolumn = { enabled = true },
+          picker = { enabled = true },
+          dashboard = { enabled = true},
+          image = {
+            enabled = false,
+            doc = {
+              inline = false,
+            },
+            hover = {
+              enabled = false,
+            },
+            formats = {
+              "png", "jpg", "jpeg", "gif", "bmp", "webp", "tiff", "heic", "avif",
+              "mp4", "mov", "avi", "mkv", "webm", "pdf",
+            },
+          },
+          indent = { enabled = true},
+        },
+        keys = {
+          { "<leader>ff", function() Snacks.picker.files() end, desc = "Snacks files picker" },
+          { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Snacks buffer picker" },
+          { "<leader>fg", function() Snacks.picker.grep() end, desc = "Snacks grep picker" },
+        },
     },
-    keys = {
-      { "<leader>ff", function() Snacks.picker.files() end, desc = "Snacks files picker" },
-      { "<leader>fb", function() Snacks.picker.buffers() end, desc = "Snacks buffer picker" },
-      { "<leader>fg", function() Snacks.picker.grep() end, desc = "Snacks grep picker" },
+    {
+        "echasnovski/mini.nvim",
+        version = false,
+        config = function()
+            require("mini.comment").setup({})
+            require("mini.move").setup({})
+            require("mini.pairs").setup({})
+            require("mini.clue").setup({})
+            require("mini.completion").setup({
+                mappings = {
+                    next_item = "<Down>",
+                    previous_item = "<Up>",
+                }
+            })
+            require("mini.snippets").setup({})
+            require("mini.icons").setup({})
+            require("mini.git").setup({})
+            require("mini.statusline").setup({})
+        end,
     },
-  },
-  {
-    "echasnovski/mini.nvim",
-    version = false,
-    config = function()
-        require("mini.comment").setup({})
-        require("mini.move").setup({})
-        require("mini.pairs").setup({})
-        require("mini.clue").setup({})
-        require("mini.git").setup({})
-        require("mini.statusline").setup({})
-    end,
-  },
-  {
+    {
       "neovim/nvim-lspconfig",
       event = { "BufReadPre", "BufNewFile" },
       config = function()
-        require("lspconfig").pyright.setup({
-          on_attach = function(client, bufnr)
-            local opts = { buffer = bufnr, silent = true }
-            vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-            vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-            vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-          end,
-        })
+        require("lspconfig").pyright.setup({})
+        require("lspconfig").gopls.setup({})
+        require("lspconfig").cssls.setup({})
+        require("lspconfig").html.setup({})
+        require("lspconfig").jsonls.setup({})
+        require("lspconfig").ts_ls.setup({})
+        require("lspconfig").rust_analyzer.setup({})
       end,
-  },
+    },
+    {
+      "nvim-treesitter/nvim-treesitter",
+    },
+    {
+      "mikavilpas/yazi.nvim",
+      version = "*",
+      event = "VeryLazy",
+      dependencies = { "nvim-lua/plenary.nvim", lazy = true },
+      opts = {
+        open_for_directories = true,
+        keymaps = { show_help = "<f1>" },
+      },
+      init = function()
+        vim.g.loaded_netrwPlugin = 1
+      end,
+    }
 }, {})
 
